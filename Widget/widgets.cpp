@@ -30,7 +30,7 @@ int main()
 int main()
 {
     char c = 128;
-
+    int ddd = 100;
     char d = 129;
     printf("%d,%d\n", c, d);
 
