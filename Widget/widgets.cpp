@@ -1,39 +1,104 @@
 // #define _CRT_SECURE_NO_WARNINGS
 // 
 // #include <stdlib.h>
-// #include <string>
- #include <vector>
- #include <iostream>
+#include <vector>
+#include <iostream>
+#include <fstream>
+#include <Windows.h>
 
+using namespace std;
 
+// int main()
+// {
+// 	unsigned int uLength = 1024 * 1024 * 250;
+// 	char*  toSave = new char[uLength];
+// 	memset(toSave, 1, uLength);
+// 	std::string toSaveStr = toSave;
+// 	fstream out;
+// 	out.open("D:\\test.txt");
+// 	if (out.is_open())
+// 	{
+// 		out.write(const_cast<char*>(toSaveStr.c_str()), toSaveStr.size());
+// 	}
+// 	else
+// 	{
+// 		DWORD d = GetLastError();
+// 		std::cout << d << std::endl;
+// 		std::cout << "open file failed" << std::endl;
+// 	}
+//     system("pause");
+//     return 0;
+// }
 
-#if 0
 int main()
 {
-    std::string fPath = "D:\\MySourse\\Test\\Image3D";
-    std::string path;
-    std::string fPathEnd = ".xml";
-    char buffer[20];
-    std::vector<std::string> vecFileName;
-    for (int i = 0; i < 100; ++i)
-    {
-        _itoa(i, buffer, 10);
-        std::string s(buffer);
-        path = fPath + s + fPathEnd;
-        vecFileName.push_back(path);
-    }
-    std::cout << vecFileName[0] << std::endl;
-    return 0;
-}
-#endif
+	LARGE_INTEGER m_nFreq;
+	LARGE_INTEGER m_nBeginTime;
+	LARGE_INTEGER nEndTime;
 
-int main()
-{
-    char c = 128;
-    int ddd = 100;
-    char d = 129;
-    printf("%d,%d\n", c, d);
+	HANDLE hFile = CreateFileA(
+		"D:/test.txt",
+		GENERIC_READ,
+		0, 
+		NULL,
+		OPEN_EXISTING,
+		FILE_ATTRIBUTE_NORMAL, 
+		NULL);
+	if (hFile != INVALID_HANDLE_VALUE)
+	{
+		cout << "文件打开成功~!\n";
+	}
+	else
+	{
+		cout << "文件打开失败！\n";
+		DWORD d = GetLastError();
+		cout << d << endl;
+		return -1;
+	}
 
-    system("pause");
-    return 0;
+
+	DWORD dwFileSize = GetFileSize(hFile, NULL);
+
+	HANDLE hFileMap = CreateFileMapping(
+		hFile, 
+		NULL, 
+		PAGE_READWRITE, 
+		0, 
+		0,
+		NULL);
+	if (hFileMap != NULL)
+	{
+		cout << "内存映射文件创建成功~!\n";
+	}
+	else
+	{
+		cout << "内存映射文件创建失败~！" << endl;
+	}
+
+	PVOID pvFile = MapViewOfFile( 
+		hFileMap,
+		FILE_MAP_WRITE, 
+		0, 
+		0, 
+		0); 
+	if (pvFile != NULL)
+	{
+		cout << "文件数据映射到进程的地址成功~!\n";
+	}
+	else
+	{
+		cout << "文件数据映射到进程的地址成功~!\n";
+	}
+
+	char *p = (char*)pvFile;
+	char* dest = new char[dwFileSize];
+	memset(dest, 0, dwFileSize);
+
+	QueryPerformanceFrequency(&m_nFreq);
+	QueryPerformanceCounter(&m_nBeginTime);
+	memcpy(dest, p, dwFileSize);
+	QueryPerformanceCounter(&nEndTime);
+	cout << (nEndTime.QuadPart - m_nBeginTime.QuadPart) * 1000 / m_nFreq.QuadPart << endl;
+
+	return 0; 
 }
