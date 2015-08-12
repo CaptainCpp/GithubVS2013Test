@@ -39,7 +39,7 @@ int main()
 	HANDLE hFile = CreateFileA(
 		"D:/test.txt",
 		GENERIC_READ,
-		0, 
+		FILE_SHARE_READ,
 		NULL,
 		OPEN_EXISTING,
 		FILE_ATTRIBUTE_NORMAL, 
@@ -62,7 +62,7 @@ int main()
 	HANDLE hFileMap = CreateFileMapping(
 		hFile, 
 		NULL, 
-		PAGE_READWRITE, 
+		PAGE_READONLY,
 		0, 
 		0,
 		NULL);
@@ -77,7 +77,7 @@ int main()
 
 	PVOID pvFile = MapViewOfFile( 
 		hFileMap,
-		FILE_MAP_WRITE, 
+		FILE_MAP_READ,
 		0, 
 		0, 
 		0); 
@@ -97,8 +97,11 @@ int main()
 	QueryPerformanceFrequency(&m_nFreq);
 	QueryPerformanceCounter(&m_nBeginTime);
 	memcpy(dest, p, dwFileSize);
+// 	std::string sDest;
+// 	sDest.insert(sDest.size(), p, dwFileSize);
 	QueryPerformanceCounter(&nEndTime);
 	cout << (nEndTime.QuadPart - m_nBeginTime.QuadPart) * 1000 / m_nFreq.QuadPart << endl;
 
+	system("pause");
 	return 0; 
 }
